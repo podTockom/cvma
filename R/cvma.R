@@ -87,11 +87,47 @@ cvma <- function(Y, X, V = 5, learners,
                                             all_learner_fits = FALSE),
                       scale = FALSE
                       ){
-    
+
     # get initial parameter values
     n <- length(Y[,1])
     J <- ncol(Y)
     M <- length(learners)
+    
+    #Complete control options if not all specified:
+    if(length(sl_control)!=6){
+      
+      options<-c("ensemble_fn", "optim_risk_fn","weight_fn","cv_risk_fn","family","alpha") 
+      spec<-options[!options %in% names(sl_control)]
+      
+      default = list(ensemble_fn = "ensemble_linear",
+                     optim_risk_fn = "optim_risk_sl_se",
+                     weight_fn = "weight_sl_convex",
+                     cv_risk_fn = "cv_risk_sl_r2",
+                     family = gaussian(),
+                     alpha = 0.05)
+      
+      for(i in 1:length(spec)){
+        sl_control<-c(sl_control, default[spec[i]])
+      }
+      
+    }
+    
+    if(length(y_weight_control)!=5){
+      
+      options<-c("ensemble_fn", "optim_risk_fn","weight_fn","cv_risk_fn","alpha") 
+      spec<-options[!options %in% names(y_weight_control)]
+      
+      default = list(ensemble_fn = "ensemble_linear",
+                     weight_fn = "weight_y_convex",
+                     optim_risk_fn = "optim_risk_y_r2",
+                     cv_risk_fn = "cv_risk_y_r2",
+                     alpha = 0.05)
+      
+      for(i in 1:length(spec)){
+        y_weight_control<-c(y_weight_control, default[spec[i]])
+      }
+      
+    }
     
     #scale all multivariate outcome by covariance matrix?
     if(scale & !(all(Y==0 | Y==1))){
