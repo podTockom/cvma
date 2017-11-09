@@ -44,6 +44,20 @@ test_that("Nonparametric R^2 with continous outcome, nloglik SL risk and convex 
   expect_equal(fit$cv_assoc$cv_measure, 0.5753772, tolerance = 0.01)
 })
 
+test_that("Test missing input info", {
+  
+  fit <- cvma(Y = Y, X = X, V = 5, 
+              learners = c("SL.glm","SL.mean"), 
+              sl_control = list(ensemble_fn = "ensemble_linear",
+                                optim_risk_fn = "optim_risk_sl_nloglik",
+                                weight_fn = "weight_sl_convex",
+                                #cv_risk_fn = "cv_risk_sl_r2",
+                                family = gaussian(),
+                                alpha = 0.05))
+  
+  expect_equal(fit$cv_assoc$cv_measure, 0.5753772, tolerance = 0.01)
+})
+
 test_that("Nonparametric R^2 with continous outcome, mean squared-error SL risk and 01 sl weights works", {
   
   fit <- cvma(Y = Y, X = X, V = 5, 
